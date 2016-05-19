@@ -43,7 +43,16 @@
             this.Name = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Email = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Spouce = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.emailSetupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.usernametoolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.emailtoolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             ((System.ComponentModel.ISupportInitialize)(this.peoplGridView)).BeginInit();
+            this.menuStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // addPersonButton
@@ -147,6 +156,7 @@
             // peoplGridView
             // 
             this.peoplGridView.AllowUserToAddRows = false;
+            this.peoplGridView.AllowUserToDeleteRows = false;
             this.peoplGridView.AllowUserToResizeColumns = false;
             this.peoplGridView.AllowUserToResizeRows = false;
             this.peoplGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -160,6 +170,7 @@
             this.peoplGridView.ReadOnly = true;
             this.peoplGridView.Size = new System.Drawing.Size(342, 304);
             this.peoplGridView.TabIndex = 12;
+            this.peoplGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.peoplGridView_CellContentClick);
             // 
             // Name
             // 
@@ -179,11 +190,68 @@
             this.Spouce.Name = "Spouce";
             this.Spouce.ReadOnly = true;
             // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(688, 24);
+            this.menuStrip1.TabIndex = 13;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveToolStripMenuItem,
+            this.emailSetupToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
+            // emailSetupToolStripMenuItem
+            // 
+            this.emailSetupToolStripMenuItem.Name = "emailSetupToolStripMenuItem";
+            this.emailSetupToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.emailSetupToolStripMenuItem.Text = "Email setup";
+            this.emailSetupToolStripMenuItem.Click += new System.EventHandler(this.emailSetupToolStripMenuItem_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.usernametoolStripStatusLabel,
+            this.emailtoolStripStatusLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 451);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(688, 22);
+            this.statusStrip1.TabIndex = 14;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // usernametoolStripStatusLabel
+            // 
+            this.usernametoolStripStatusLabel.Name = "usernametoolStripStatusLabel";
+            this.usernametoolStripStatusLabel.Size = new System.Drawing.Size(73, 17);
+            this.usernametoolStripStatusLabel.Text = "                      ";
+            // 
+            // emailtoolStripStatusLabel
+            // 
+            this.emailtoolStripStatusLabel.Name = "emailtoolStripStatusLabel";
+            this.emailtoolStripStatusLabel.Size = new System.Drawing.Size(97, 17);
+            this.emailtoolStripStatusLabel.Text = "                              ";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(688, 473);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.peoplGridView);
             this.Controls.Add(this.linkButton);
             this.Controls.Add(this.linkComboBox);
@@ -196,9 +264,15 @@
             this.Controls.Add(this.NameTextBox);
             this.Controls.Add(this.RunButton);
             this.Controls.Add(this.addPersonButton);
-          
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
+            
             this.Text = "Secret Sanata";
             ((System.ComponentModel.ISupportInitialize)(this.peoplGridView)).EndInit();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -221,6 +295,13 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Name;
         private System.Windows.Forms.DataGridViewTextBoxColumn Email;
         private System.Windows.Forms.DataGridViewTextBoxColumn Spouce;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem emailSetupToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel usernametoolStripStatusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel emailtoolStripStatusLabel;
     }
 }
 

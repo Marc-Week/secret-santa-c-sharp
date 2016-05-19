@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -18,14 +20,18 @@ namespace Seceret_Sanata
 
         private Person selectedLink = null;
         private Person selectedSpouce = null;
-        private String Username = null;
-        private String UserEmail = null;
+        private String Username = "";
+        private String UserEmail = "";
 
 
         public MainForm()
         {
             InitializeComponent();
-            people = new List<Person>();
+            people = openCSV();
+            drawNameList();
+            linkComboBox.DataSource = people.Select(x => x.Name).ToList();
+            SpouseComboBox.DataSource = people.Select(x => x.Name).ToList();
+            openEmail();
         }
 
         private void addPersonButton_Click(object sender, EventArgs e)
@@ -63,7 +69,7 @@ namespace Seceret_Sanata
 
             foreach(Person giver in people)
             {
-                Console.WriteLine(giver.Name + " " + giver.recipcant.Name);
+                Debug.WriteLine(giver.Name + " " + giver.recipcant.Name);
             }
         }
 
@@ -71,8 +77,8 @@ namespace Seceret_Sanata
         private void sendEmail(String Message, Person DST, string password)
         {
 
-            var fromAddress = new MailAddress("mrcwk@yahoo.com", "marc week");
-            var toAddress = new MailAddress("marcustweek@gmail.com", "marc");
+            var fromAddress = new MailAddress(UserEmail, UserEmail);
+            var toAddress = new MailAddress(DST.Email, DST.Name);
 
             const string subject = "Secret Santa";
 
@@ -117,15 +123,17 @@ namespace Seceret_Sanata
             Random rand = new Random();
             int Size = people.Count;
             Boolean[] used = new bool[Size];
+            
+
             for (int j = 0; j < Size; ++j) used[j] = false;
 
             for (int i = 0; i < Size; i++)
             {
                 int gift;
                
-                if (i == Size - 2 && used[Size - 1])
+                if (i == Size - 2 && !used[Size - 1] && people[i].Spouse == people[i + 1])
                 {
-                    //reset if you get to the end and are both spouces
+                    //reset if you get to the end and are both spouces and they are the only ones left
                     i = 0;
                     for (int j = 0; j < Size; ++j) used[j] = false;
                 }
@@ -134,7 +142,7 @@ namespace Seceret_Sanata
                     gift = rand.Next() % Size;
 
 
-                } while (!used[gift] || i == gift || people[i].Spouse == people[gift]);
+                } while (used[gift] || i == gift || people[i].Spouse == people[gift]);
 
 
                 people[i].recipcant = people[gift];
@@ -183,6 +191,151 @@ namespace Seceret_Sanata
             drawNameList();
         }
 
-      
+        private void peoplGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //TODO CONVERT TO SQLLITE?
+            string CSV = "";
+            foreach(Person p in people)
+            {
+                CSV += p.Name + "," + p.Email + Environment.NewLine;
+
+            }
+            CSV += "#" + Environment.NewLine;
+            foreach (Person p in people)
+            {
+                if (p.Spouse != null)
+                    CSV += people.IndexOf(p) + "," + people.IndexOf(p.Spouse) + Environment.NewLine;
+
+            }
+            try {
+                FileStream file = new FileStream("sav.csv", FileMode.Create);
+                file.Write(System.Text.Encoding.UTF8.GetBytes(CSV), 0, CSV.Length);
+                file.Close();
+            }
+            catch (Exception d)
+            {
+                MessageBox.Show("Error: " + d);
+            }
+        }
+
+        private List<Person> openCSV()
+        {
+            List<Person> savelist = new List<Person>();
+            
+            if(File.Exists("sav.csv"))
+            {
+                System.IO.StreamReader file = new System.IO.StreamReader("sav.csv");
+                string line = file.ReadLine().TrimEnd(Environment.NewLine.ToCharArray());
+                
+                if (!string.IsNullOrEmpty(line)) line = line.TrimEnd(Environment.NewLine.ToCharArray());
+                while (!string.IsNullOrEmpty(line) && line != "#") 
+                {
+                    String[] person = line.Split(',');
+                    if (person.Length == 2 && !string.IsNullOrEmpty(person[0]) && !string.IsNullOrEmpty(person[1]))
+                        savelist.Add(new Person(person[0], person[1]));
+
+                    line = file.ReadLine();
+                    if (!string.IsNullOrEmpty(line)) line = line.TrimEnd(Environment.NewLine.ToCharArray()); 
+                }
+                
+
+                while (!file.EndOfStream &&  !string.IsNullOrEmpty(line)) 
+                {
+                    String[] link = line.Split(',');
+                    int person, spouce;
+                    if (link.Length == 2 && int.TryParse(link[0], out person) && int.TryParse(link[1], out spouce))
+                        savelist[person].Spouse = savelist[spouce];
+                        
+                    line = file.ReadLine().TrimEnd(Environment.NewLine.ToCharArray());
+                    if (!string.IsNullOrEmpty(line)) line = line.TrimEnd(Environment.NewLine.ToCharArray());
+
+                }
+                
+                String[] link1 = line.Split(',');
+                int person2, spouce2;
+                if (link1.Length == 2 && int.TryParse(link1[0], out person2) && int.TryParse(link1[1], out spouce2))
+                    savelist[person2].Spouse = savelist[spouce2];
+
+                file.Close();
+            }
+
+            return savelist;
+        }
+
+        private void emailSetupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form emailform = new Form();
+            
+            emailform.Text = "Enter username and password";
+            Label ulabel = new Label();
+            ulabel.Text = "Username:";
+            ulabel.Location = new Point(5, 5);
+            TextBox username = new TextBox();
+            username.Location = new Point(5, 30);
+            Label elabel = new Label();
+            elabel.Text = "Email:";
+            elabel.Location = new Point(5, 55);
+
+            TextBox email = new TextBox();
+            email.Location = new Point(5, 80);
+
+            Button button = new Button();
+            button.Text = "Accept";
+            button.Location = new Point(30, 105);
+            button.Click += (o, i) =>
+            {
+                Username = username.Text;
+                UserEmail = email.Text;
+                usernametoolStripStatusLabel.Text = Username;
+                emailtoolStripStatusLabel.Text = UserEmail;
+
+                emailform.Dispose();
+                saveEmail();
+            };
+
+
+            emailform.Size = new Size(90, 200);
+            emailform.Controls.Add(ulabel);
+            emailform.Controls.Add(elabel);
+            emailform.Controls.Add(username);
+            emailform.Controls.Add(email);
+            emailform.Controls.Add(button);
+
+            emailform.Show();
+
+            
+
+
+        }
+
+        private void saveEmail()
+        {
+            string CSV = Username + "," + UserEmail;
+            FileStream file = new FileStream("mail.csv", FileMode.Create);
+            file.Write(System.Text.Encoding.UTF8.GetBytes(CSV), 0, CSV.Length);
+            file.Close();
+        }
+        private void openEmail()
+        {
+            if (File.Exists("mail.csv"))
+            {
+                System.IO.StreamReader file = new System.IO.StreamReader("mail.csv");
+                string line = file.ReadLine().TrimEnd(Environment.NewLine.ToCharArray());
+                file.Close();
+                string[] info = line.Split(',');
+                if (info.Length == 2)
+                {
+                    Username = info[0];
+                    UserEmail = info[1];
+                    usernametoolStripStatusLabel.Text = Username;
+                    emailtoolStripStatusLabel.Text = UserEmail;
+                }
+            }
+        }
     }
 }
